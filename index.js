@@ -1,14 +1,24 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const connection = require("./database/db");
+const { sequelize, conecction } = require("./database/db");
+const Auth = require("./app/controllers/Auth");
 
 //enable environment variables
 dotenv.config();
 
 const app = express();
 
+app.use(express.json());
+
 // connection with db
-connection();
+
+conecction();
+
+// routes
+app.get("/", (req, res) => {
+	res.status(200).send("Estas en la raiz");
+});
+app.post("/auth/register", Auth.register);
 
 // undefined routes
 app.get("*", (req, res) => {

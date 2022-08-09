@@ -1,11 +1,17 @@
 const { Sequelize } = require("sequelize");
-const connection = async () => {
-	// Passing parameters separately (other dialects)
-	const sequelize = new Sequelize("api_disney", "root", "gabogalt", {
-		host: "127.0.0.1",
-		dialect: "mysql" /* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */,
-	});
+const dotenv = require("dotenv");
+dotenv.config();
 
+// Passing parameters separately (other dialects)
+const sequelize = new Sequelize("api_disney", "root", process.env.PASSDB, {
+	host: "127.0.0.1",
+	dialect: "mysql" /* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */,
+	define: {
+		timestamps: false,
+	},
+});
+
+const conecction = async () => {
 	try {
 		await sequelize.authenticate();
 		console.log("Connection has been established successfully.");
@@ -14,4 +20,4 @@ const connection = async () => {
 	}
 };
 
-module.exports = connection;
+module.exports = { sequelize, conecction };
