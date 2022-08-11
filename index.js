@@ -19,6 +19,7 @@ app.get("/", (req, res) => {
 	res.status(200).send("Estas en la raiz");
 });
 app.post("/auth/register", Auth.register);
+app.post("/auth/login", Auth.login);
 
 // undefined routes
 app.get("*", (req, res) => {
