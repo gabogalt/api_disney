@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const { sequelize, conecction } = require("./database/db");
 const Auth = require("./app/controllers/Auth");
+const Character = require("./app/controllers/Character");
 
 //enable environment variables
 dotenv.config();
@@ -18,6 +19,8 @@ conecction();
 app.get("/", (req, res) => {
 	res.status(200).send("Estas en la raiz");
 });
+app.get("/characters", Character.getCharacters);
+app.post("/characters/create", Character.createCharacters);
 app.post("/auth/register", Auth.register);
 app.post("/auth/login", Auth.login);
 

@@ -1,5 +1,5 @@
 const { Sequelize, DataTypes } = require("sequelize");
-const sequelize = new Sequelize("sqlite::memory:");
+const { sequelize } = require("../../database/db");
 
 const Characters = sequelize.define("characters", {
 	// Model attributes are defined here
@@ -23,9 +23,9 @@ const Characters = sequelize.define("characters", {
 		type: DataTypes.STRING,
 		allowNull: false,
 	},
-	associatedMoviesOrSeries: {
-		type: DataTypes.STRING,
-		allowNull: false,
+	associated_content: {
+		type: DataTypes.JSON,
+		allowNull: true,
 	},
 });
 
