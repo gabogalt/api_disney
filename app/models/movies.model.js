@@ -1,7 +1,7 @@
 const { Sequelize, DataTypes } = require("sequelize");
-const sequelize = new Sequelize("sqlite::memory:");
+const { sequelize } = require("../../database/db");
 
-const MoviesOrSeries = sequelize.define("movies_or_Series", {
+const Movies = sequelize.define("movies", {
 	// Model attributes are defined here
 	image: {
 		type: DataTypes.STRING,
@@ -11,18 +11,14 @@ const MoviesOrSeries = sequelize.define("movies_or_Series", {
 		type: DataTypes.STRING,
 		allowNull: false,
 	},
-	createdAt: {
+	created_at: {
 		type: DataTypes.DATE,
 		allowNull: false,
 	},
-	assessment: {
+	rating: {
 		type: DataTypes.INTEGER,
-		allowNull: false,
-	},
-	associatedCharacters: {
-		type: DataTypes.STRING,
 		allowNull: false,
 	},
 });
 
-module.exports = MoviesOrSeries;
+module.exports = Movies;

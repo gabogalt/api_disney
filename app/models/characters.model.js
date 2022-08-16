@@ -23,10 +23,6 @@ const Characters = sequelize.define("characters", {
 		type: DataTypes.STRING,
 		allowNull: false,
 	},
-	associated_content: {
-		type: DataTypes.JSON,
-		allowNull: true,
-	},
 });
 
 module.exports = Characters;

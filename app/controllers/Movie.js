@@ -1,82 +1,69 @@
-const Characters = require("../models/characters.model");
+const Movies = require("../models/movies.model");
 const CharacterHasMovie = require("../models/characterHasMovie.model");
 const { Op } = require("sequelize");
 
-const Character = {
-	getCharacters: async (req, res) => {
+const Movie = {
+	getMovies: async (req, res) => {
 		const { query } = req;
 		let filters = null;
-		// verifico si viene algfuna variable por query string
 		if (query.name || query.age || query.idMovie) {
 			filters = {
 				name: (query.name ??= ""),
-				age: (query.age ??= 0),
-				idMovie: (query.movies ??= 0),
+				genre: (query.genre ??= ""),
+				order: (query.movies ??= "ASC"),
 			};
 		}
 		try {
-			let characters;
-			if (filters != null) {
-				characters = await Characters.query({
-					attributes: ["id", "image", "name"],
-					where: {
-						[Op.or]: [{ name: filters.name }, { age: filters.age }],
-					},
-				});
-			} else {
-				characters = await Characters.findAll({
-					attributes: ["id", "image", "name"],
-				});
-			}
+			const movies = await Movies.findAll({
+				attributes: ["id", "image", "tittle", "created_at"],
+			});
 
-			if (characters) {
-				res.status(200).send(characters);
+			if (movies) {
+				res.status(200).send(movies);
 			} else {
 				res
 					.status(400)
-					.send("No se encuentran personajes registrados en la base de datos");
+					.send("No se encuentran peliculas registrados en la base de datos");
 			}
 		} catch (err) {
 			res.status(500).send(err.message);
 		}
 	},
-	createCharacter: async (req, res) => {
+	createMovie: async (req, res) => {
 		const { body } = req;
-		if (!body.name) {
-			res.send("El nombre es requerido");
+		if (!body.tittle) {
+			console.log("El titulo es requerido");
 			return;
 		}
 		try {
-			// varifico si existe el character en bd
-			const isCharacter = await Characters.findOne({
-				where: { name: body.name },
+			const isMovie = await Movies.findOne({
+				where: { tittle: body.tittle },
 			});
-
-			if (isCharacter) {
-				res.send("El personaje ya existe en la base de datos");
+			if (isMovie) {
+				res.status(400).send("La pelicula ya existe en la base de datos");
 				return;
 			}
-			// si no exisate lo crea
-			const create = await Characters.create({
+			const create = await Movies.create({
 				image: body.image,
-				name: body.name,
-				age: body.age,
-				weight: body.weight,
-				history: body.history,
+				tittle: body.tittle,
+				created_at: body.created_at,
+				rating: body.rating,
 			});
+
 			if (create) {
-				// verifica si tiene una pelicula asociada
 				if (!body.movies_id) {
-					res.status(200).send("El personaje ha sido creado correctamente");
+					res.status(200).send("La pelicula ha sido creada correctamente");
 					return;
 				}
 				const associated_movie = await CharacterHasMovie.create({
-					characters_id: create.id,
-					movies_id: body.movies_id,
+					characters_id: body.characters_id,
+					movies_id: create.id,
 				});
 
 				if (associated_movie) {
-					res.status(200).send("El personaje ha sido asignado correctamente");
+					res
+						.status(200)
+						.send("La pelicula ha sido creada y asignada correctamente");
 				} else {
 					res
 						.status(400)
@@ -91,7 +78,7 @@ const Character = {
 			res.status(500).send(err.message);
 		}
 	},
-	updateCharacter: async (req, res) => {
+	updateMovie: async (req, res) => {
 		const { body, params } = req;
 
 		if (!params.id) {
@@ -100,27 +87,26 @@ const Character = {
 
 		const data = {
 			image: body.image,
-			name: body.name,
-			age: body.age,
-			weight: body.weight,
-			history: body.history,
+			tittle: body.tittle,
+			created_at: body.created_at,
+			rating: body.rating,
 		};
 
 		try {
-			const update = await Characters.update(data, {
+			const update = await Movies.update(data, {
 				where: {
 					id: params.id,
 				},
 			});
 			if (update) {
-				if (!body.id_movie) {
-					res.sendStatus(204);
+				if (!body.characters_id) {
+					res.status(200).send();
 					return;
 				}
 
 				const dataAssociated = {
-					characters_id: parseInt(params.id),
-					movies_id: body.id_movie,
+					characters_id: body.characters_id,
+					movies_id: parseInt(params.id),
 				};
 
 				//  verifica si tiene una pelicula asociada con el id_movie a actualizar
@@ -150,13 +136,13 @@ const Character = {
 			res.status(500).send(err.message);
 		}
 	},
-	deleteCharacter: async (req, res) => {
+	deleteMovie: async (req, res) => {
 		if (!req.params.id) {
 			res.status(400).send("El id es obligatorio");
 		}
 
 		try {
-			const destroy = await Characters.destroy({
+			const destroy = await Movies.destroy({
 				where: {
 					id: req.params.id,
 				},
@@ -171,20 +157,18 @@ const Character = {
 			res.status(500).send(error.message);
 		}
 	},
-	getCharacter: async (req, res) => {
+	getMovie: async (req, res) => {
 		if (!req.params.id) {
 			res.status(400).send("El id es requerido");
 		}
 		try {
-			const character = await Characters.findByPk(req.params.id);
+			const character = await Movies.findByPk(req.params.id);
 			if (character) {
 				res.status(200).send(character);
 			} else {
 				res
 					.status(400)
-					.send(
-						"No se encuentra el personaje solicitados en la base de datos."
-					);
+					.send("No se encuentra la pelicula solicitada en la base de datos.");
 			}
 		} catch (err) {
 			res.status(500).send(err.message);
@@ -192,4 +176,4 @@ const Character = {
 	},
 };
 
-module.exports = Character;
+module.exports = Movie;
