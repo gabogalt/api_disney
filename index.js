@@ -1,7 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const { sequelize, conecction } = require("./database/db");
-const Auth = require("./app/controllers/Auth");
+const { Auth, isAuthenticated } = require("./app/controllers/Auth");
 const Character = require("./app/controllers/Character");
 const Movie = require("./app/controllers/Movie");
 
@@ -22,18 +22,22 @@ app.get("/", (req, res) => {
 	res.status(200).send("Estas en la raiz");
 });
 // Characters
-app.get("/characters", Character.getCharacters);
-app.post("/characters/create", Character.createCharacter);
-app.put("/characters/update/:id", Character.updateCharacter);
-app.delete("/characters/delete/:id", Character.deleteCharacter);
-app.get("/characters/:id", Character.getCharacter);
+app.get("/characters", isAuthenticated, Character.getCharacters);
+app.post("/characters/create", isAuthenticated, Character.createCharacter);
+app.put("/characters/update/:id", isAuthenticated, Character.updateCharacter);
+app.delete(
+	"/characters/delete/:id",
+	isAuthenticated,
+	Character.deleteCharacter
+);
+app.get("/characters/:id", isAuthenticated, Character.getCharacter);
 
 // movies
-app.get("/movies", Movie.getMovies);
-app.post("/movies/create", Movie.createMovie);
-app.put("/movies/update/:id", Movie.updateMovie);
-app.delete("/movies/delete/:id", Movie.deleteMovie);
-app.get("/movies/:id", Movie.getMovie);
+app.get("/movies", isAuthenticated, Movie.getMovies);
+app.post("/movies/create", isAuthenticated, Movie.createMovie);
+app.put("/movies/update/:id", isAuthenticated, Movie.updateMovie);
+app.delete("/movies/delete/:id", isAuthenticated, Movie.deleteMovie);
+app.get("/movies/:id", isAuthenticated, Movie.getMovie);
 
 // Auth
 app.post("/auth/register", Auth.register);

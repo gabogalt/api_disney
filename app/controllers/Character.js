@@ -7,17 +7,16 @@ const Character = {
 		const { query } = req;
 		let filters = null;
 		// verifico si viene algfuna variable por query string
-		if (query.name || query.age || query.idMovie) {
+		if (query.name || query.age) {
 			filters = {
 				name: (query.name ??= ""),
 				age: (query.age ??= 0),
-				idMovie: (query.movies ??= 0),
 			};
 		}
 		try {
 			let characters;
 			if (filters != null) {
-				characters = await Characters.query({
+				characters = await Characters.findAll({
 					attributes: ["id", "image", "name"],
 					where: {
 						[Op.or]: [{ name: filters.name }, { age: filters.age }],
